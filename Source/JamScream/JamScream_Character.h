@@ -26,6 +26,7 @@ public:
 
 	void Move(const FInputActionValue &value);
 	void Look(const FInputActionValue &value);
+	void Menu_Main_Toogle(const FInputActionValue &value);
 
 private:
 
@@ -35,5 +36,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Input) UInputAction *Action_Jump;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Input) UInputAction *Action_Move;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Input) UInputAction *Action_Look;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Input) UInputAction *Action_Menu_Main;
 };
 //------------------------------------------------------------------------------------------------------------

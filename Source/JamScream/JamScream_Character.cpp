@@ -59,6 +59,7 @@ void AJamScream_Character::SetupPlayerInputComponent(UInputComponent *player_inp
 		enhanced_input_component->BindAction(Action_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		enhanced_input_component->BindAction(Action_Move, ETriggerEvent::Triggered, this, &AJamScream_Character::Move);
 		enhanced_input_component->BindAction(Action_Look, ETriggerEvent::Triggered, this, &AJamScream_Character::Look);
+		enhanced_input_component->BindAction(Action_Menu_Main, ETriggerEvent::Triggered, this, &AJamScream_Character::Menu_Main_Toogle);
 	}
 	else
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
@@ -90,5 +91,10 @@ void AJamScream_Character::Look(const FInputActionValue &value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AJamScream_Character::Menu_Main_Toogle(const FInputActionValue &value)
+{
+
 }
 //------------------------------------------------------------------------------------------------------------

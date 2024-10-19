@@ -18,6 +18,8 @@ r.GPUSkin.Support16BitBoneIndex=False
 r.GPUSkin.UnlimitedBoneInfluences=False
 r.SkinCache.CompileShaders=False
 SkeletalMesh.UseExperimentalChunking=1
+r.DefaultFeature.MotionBlur=False
+r.AntiAliasingMethod=0
 
 [/Script/WindowsTargetPlatform.WindowsTargetSettings]
 DefaultGraphicsRHI=DefaultGraphicsRHI_DX12
