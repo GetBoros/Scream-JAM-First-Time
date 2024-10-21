@@ -7,7 +7,14 @@
 		{
 			"Name": "JamScream",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		},
+                {
+			"Name": "Module_Menu_Main",
+			"Type": "Runtime"
 		}
 	],
 	"Plugins": [
