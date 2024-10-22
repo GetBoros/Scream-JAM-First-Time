@@ -15,6 +15,9 @@
 
 ### C++ :
 
+- [ ] Make settings in CPP
+- [ ] Add screen percentage and directx 11 support
+
 ### Optimization:
 
 ## P.S.
