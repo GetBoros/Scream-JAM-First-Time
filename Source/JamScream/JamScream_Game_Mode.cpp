@@ -4,79 +4,15 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameUserSettings.h"
 
-// UJamScreen_Widget
-void UJamScreen_Widget::NativeConstruct()
+// UAMenu_Main_Settings
+void UAMenu_Main_Settings::NativeConstruct()
 {
 	Super::NativeConstruct();
-}
-//------------------------------------------------------------------------------------------------------------
-void UJamScreen_Widget::Update_Options() const
-{
-    UGameUserSettings *user_settings = GEngine->GetGameUserSettings();
 
-    switch (Option_Type)
-    {
-    case EOption_Type::EPT_None:
-        break;
-    case EOption_Type::EPT_Window_Mode:
-        user_settings->SetFullscreenMode(EWindowMode::ConvertIntToWindowMode(Widget_Index) );
-        user_settings->ApplyResolutionSettings(false);
-        break;
-    case EOption_Type::EPT_Quality_Presset:
-        user_settings->SetOverallScalabilityLevel(Widget_Index);
-        break;
-    case EOption_Type::EPT_Quality_Shadows:
-        user_settings->SetShadowQuality(Widget_Index);
-        break;
-    case EOption_Type::EPT_Quality_Foliage:
-        user_settings->SetFoliageQuality(Widget_Index);
-        break;
-    case EOption_Type::EPT_Quality_Texture:
-        user_settings->SetTextureQuality(Widget_Index);
-        break;
-    case EOption_Type::EPT_Quality_Shading:
-        user_settings->SetShadingQuality(Widget_Index);
-        break;
-    case EOption_Type::EPT_Quality_Reflection:
-        user_settings->SetReflectionQuality(Widget_Index);
-        break;
-    case EOption_Type::EPT_Quality_Anti_Aliasing:
-        user_settings->SetAntiAliasingQuality(Widget_Index);
-        break;
-    case EOption_Type::EPT_Quality_Visual_Effects:
-        user_settings->SetVisualEffectQuality(Widget_Index);
-        break;
-    case EOption_Type::EPT_Quality_View_Distances:
-        user_settings->SetViewDistanceQuality(Widget_Index);
-        break;
-    case EOption_Type::EPT_Quality_Post_Processing:
-        user_settings->SetPostProcessingQuality(Widget_Index);
-        break;
-    case EOption_Type::EPT_Quality_Global_Illumination_Quality:
-        user_settings->SetGlobalIlluminationQuality(Widget_Index);
-        break;
-    case EOption_Type::EPT_Frame_Rate:
-        user_settings->SetFrameRateLimit(24);
-        break;
-    case EOption_Type::EPT_Screen_Resolution:
-        Set_Screen_Resolution();
-        break;
-    case EOption_Type::EPT_Screen_Percentage:
-        Set_Screen_Percentage();
-        break;
-    case EOption_Type::EPT_Toogle_Directx:
-        Toogle_DirectX();
-        break;
-    case EOption_Type::EPT_Show_Frame_Per_Sec:
-        UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("stat fps") );  // Exit from game
-        break;
-    default:
-        break;
-    }
-    user_settings->ApplySettings(false);
+    User_Settings = GEngine->GetGameUserSettings();
 }
 //------------------------------------------------------------------------------------------------------------
-void UJamScreen_Widget::Toogle_DirectX() const
+void UAMenu_Main_Settings::Toogle_DirectX() const
 {
     FString config_path = FPaths::ProjectConfigDir() + TEXT("DefaultEngine.ini");
     FString current_rhi;
@@ -88,42 +24,36 @@ void UJamScreen_Widget::Toogle_DirectX() const
             GConfig->SetString(TEXT("/Script/WindowsTargetPlatform.WindowsTargetSettings"), TEXT("DefaultGraphicsRHI"), TEXT("DefaultGraphicsRHI_DX12"), config_path);
 
     GConfig->Flush(false, config_path);  // Save to config
-    UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("quit"));  // Exit from game
+    UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("quit") );  // Exit from game
 }
 //------------------------------------------------------------------------------------------------------------
-void UJamScreen_Widget::Set_Screen_Percentage() const
+void UAMenu_Main_Settings::Set_Screen_Percentage() const
 {
-    UGameUserSettings *user_settings = GEngine->GetGameUserSettings();
-
-    if (!user_settings != 0)
+    if (!User_Settings != 0)
         return;
 
     switch (Widget_Index)
     {
     case 0:
-        user_settings->SetResolutionScaleValueEx(50);
+        User_Settings->SetResolutionScaleValueEx(50);
         break;
     case 1:
-        user_settings->SetResolutionScaleValueEx(75);
+        User_Settings->SetResolutionScaleValueEx(75);
         break;
     case 2:
-        user_settings->SetResolutionScaleValueEx(100);
+        User_Settings->SetResolutionScaleValueEx(100);
         break;
     default:
-        user_settings->SetResolutionScaleValueEx(50);
+        User_Settings->SetResolutionScaleValueEx(50);
         break;
     }
-
-    user_settings->ApplySettings(false);
-    user_settings->SaveSettings();
 }
 //------------------------------------------------------------------------------------------------------------
-void UJamScreen_Widget::Set_Screen_Resolution() const
+void UAMenu_Main_Settings::Set_Screen_Resolution() const
 {
-    FIntPoint point;
-    UGameUserSettings *user_settings = GEngine->GetGameUserSettings();
-
-    if (!user_settings != 0)
+    FIntPoint point {};
+    
+    if (!User_Settings != 0)
         return;
 
     switch (Widget_Index)
@@ -141,9 +71,75 @@ void UJamScreen_Widget::Set_Screen_Resolution() const
         point = FIntPoint(960, 540);
         break;
     }
-    user_settings->SetScreenResolution(point);
-    user_settings->SetFullscreenMode(EWindowMode::Fullscreen);
-    user_settings->ApplySettings(false);
+    User_Settings->SetScreenResolution(point);
+    User_Settings->SetFullscreenMode(EWindowMode::Fullscreen);
+}
+//------------------------------------------------------------------------------------------------------------
+void UAMenu_Main_Settings::Update_Options() const
+{
+    if (!User_Settings != 0)
+        return;
+
+    switch (Option_Type)
+    {
+    case EOption_Type::EPT_None:
+        break;
+    case EOption_Type::EPT_Window_Mode:
+        User_Settings->SetFullscreenMode(EWindowMode::ConvertIntToWindowMode(Widget_Index) );
+        User_Settings->ApplyResolutionSettings(false);
+        break;
+    case EOption_Type::EPT_Quality_Presset:
+        User_Settings->SetOverallScalabilityLevel(Widget_Index);
+        break;
+    case EOption_Type::EPT_Quality_Shadows:
+        User_Settings->SetShadowQuality(Widget_Index);
+        break;
+    case EOption_Type::EPT_Quality_Foliage:
+        User_Settings->SetFoliageQuality(Widget_Index);
+        break;
+    case EOption_Type::EPT_Quality_Texture:
+        User_Settings->SetTextureQuality(Widget_Index);
+        break;
+    case EOption_Type::EPT_Quality_Shading:
+        User_Settings->SetShadingQuality(Widget_Index);
+        break;
+    case EOption_Type::EPT_Quality_Reflection:
+        User_Settings->SetReflectionQuality(Widget_Index);
+        break;
+    case EOption_Type::EPT_Quality_Anti_Aliasing:
+        User_Settings->SetAntiAliasingQuality(Widget_Index);
+        break;
+    case EOption_Type::EPT_Quality_Visual_Effects:
+        User_Settings->SetVisualEffectQuality(Widget_Index);
+        break;
+    case EOption_Type::EPT_Quality_View_Distances:
+        User_Settings->SetViewDistanceQuality(Widget_Index);
+        break;
+    case EOption_Type::EPT_Quality_Post_Processing:
+        User_Settings->SetPostProcessingQuality(Widget_Index);
+        break;
+    case EOption_Type::EPT_Quality_Global_Illumination_Quality:
+        User_Settings->SetGlobalIlluminationQuality(Widget_Index);
+        break;
+    case EOption_Type::EPT_Frame_Rate:
+        User_Settings->SetFrameRateLimit(24);
+        break;
+    case EOption_Type::EPT_Screen_Resolution:
+        Set_Screen_Resolution();
+        break;
+    case EOption_Type::EPT_Screen_Percentage:
+        //Set_Screen_Percentage();
+        break;
+    case EOption_Type::EPT_Toogle_Directx:
+        Toogle_DirectX();
+        break;
+    case EOption_Type::EPT_Show_Frame_Per_Sec:
+        UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("stat fps") );  // Exit from game
+        break;
+    default:
+        break;
+    }
+    User_Settings->ApplySettings(false);
 }
 //------------------------------------------------------------------------------------------------------------
 

@@ -5,7 +5,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "JamScream_Game_Mode.generated.h"
 
-// Определение enum class
+// EOption_Type
 UENUM(BlueprintType) enum class EOption_Type : uint8
 {
 	EPT_None UMETA(DisplayName = "EPT_None"),
@@ -27,22 +27,38 @@ UENUM(BlueprintType) enum class EOption_Type : uint8
 	EPT_Toogle_Directx UMETA(DisplayName = "EPT_Toogle_Directx"),
 	EPT_Show_Frame_Per_Sec UMETA(DisplayName = "EPT_Show_Frame_Per_Sec")
 };
+//-----------------------------------------------------------------------------------------------------------
 
 // UADrag_Widget
-UCLASS(meta = (DisableNativeTick)) class UJamScreen_Widget : public UUserWidget
+UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Setting_Button : public UUserWidget
+{
+	GENERATED_BODY()
+
+public:
+
+};
+//-----------------------------------------------------------------------------------------------------------
+
+
+
+
+// UADrag_Widget
+UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Settings : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
 	virtual void NativeConstruct();
 
-	UFUNCTION(BlueprintCallable) void Update_Options() const;
+	UGameUserSettings *User_Settings;
 	
-	UFUNCTION(BlueprintCallable) void Toogle_DirectX() const;
-	UFUNCTION(BlueprintCallable) void Set_Screen_Percentage() const;
-	UFUNCTION(BlueprintCallable) void Set_Screen_Resolution() const;
+	void Toogle_DirectX() const;
+	void Set_Screen_Percentage() const;
+	void Set_Screen_Resolution() const;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Widget_Index;
+	UFUNCTION(BlueprintCallable) void Update_Options() const;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init") int Widget_Index;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) EOption_Type Option_Type;
 
 	// TASKS
@@ -54,7 +70,8 @@ public:
 		- Store array of buttons to redraw active and else if needed
 	*/
 };
-//-----------------------------------------------------------------------------------------------------------         
+//-----------------------------------------------------------------------------------------------------------
+
 
 
 
@@ -68,4 +85,4 @@ UCLASS(minimalapi) class AJamScream_Game_Mode : public AGameModeBase
 public:
 	AJamScream_Game_Mode();
 };
-//------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------
