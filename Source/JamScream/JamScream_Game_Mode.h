@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Blueprint/UserWidget.h"
-
 #include "GameFramework/GameModeBase.h"
 #include "JamScream_Game_Mode.generated.h"
 
@@ -35,7 +34,19 @@ UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Setting_Button : public UU
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct();
 
+	void Toogle_DirectX() const;
+	void Set_Screen_Percentage() const;
+	void Set_Screen_Resolution() const;
+	
+	
+	UFUNCTION(BlueprintCallable) void Init();
+	UFUNCTION(BlueprintCallable) void Update_State() const;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Widget_Index;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) EOption_Type Option_Type;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) FText Button_Name;
 };
 //-----------------------------------------------------------------------------------------------------------
 
@@ -49,26 +60,6 @@ UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Settings : public UUserWid
 
 public:
 	virtual void NativeConstruct();
-
-	UGameUserSettings *User_Settings;
-	
-	void Toogle_DirectX() const;
-	void Set_Screen_Percentage() const;
-	void Set_Screen_Resolution() const;
-
-	UFUNCTION(BlueprintCallable) void Update_Options() const;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init") int Widget_Index;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) EOption_Type Option_Type;
-
-	// TASKS
-	/*
-		- Create Button
-			- This button need to be redrawed
-			- She has name and index
-			- ...
-		- Store array of buttons to redraw active and else if needed
-	*/
 };
 //-----------------------------------------------------------------------------------------------------------
 
