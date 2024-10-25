@@ -77,13 +77,9 @@ void UAMenu_Main_Setting_Button::Set_Screen_Resolution() const
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Setting_Button::Init()
 {
-    FName names[5] = { L"1", L"2", L"3", L"4", L"5"};
+    FName names[5] = { L"1", L"2", L"3", L"4", L"5"};  // !!! To Config
     if (Button_Name.IsEmpty() )
-    {
-        Button_Name = FText::FromName(names[Widget_Index]);
-        int yy = 0;
-        yy++;
-    }
+        Button_Name = FText::FromName(names[Widget_Index]);  // Set Name | Default Buttons
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Setting_Button::Update_State() const
@@ -153,7 +149,11 @@ void UAMenu_Main_Setting_Button::Update_State() const
         break;
     }
     user_settings->ApplySettings(false);
-
+}
+//------------------------------------------------------------------------------------------------------------
+void UAMenu_Main_Setting_Button::Button_Redraw_Implementation()
+{
+    int yy = 0;  // Called if not released in BP
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -164,77 +164,89 @@ void UAMenu_Main_Setting_Button::Update_State() const
 void UAMenu_Main_Settings::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-    //user_settings = GEngine->GetGameUserSettings();
 }
 //------------------------------------------------------------------------------------------------------------
-//void UAMenu_Main_Settings::Update_Options() const
-//{
-//    if (!user_settings != 0)
-//        return;
-//
-//    switch (Option_Type)
-//    {
-//    case EOption_Type::EPT_None:
-//        break;
-//    case EOption_Type::EPT_Window_Mode:
-//        user_settings->SetFullscreenMode(EWindowMode::ConvertIntToWindowMode(Widget_Index) );
-//        user_settings->ApplyResolutionSettings(false);
-//        break;
-//    case EOption_Type::EPT_Quality_Presset:
-//        user_settings->SetOverallScalabilityLevel(Widget_Index);
-//        break;
-//    case EOption_Type::EPT_Quality_Shadows:
-//        user_settings->SetShadowQuality(Widget_Index);
-//        break;
-//    case EOption_Type::EPT_Quality_Foliage:
-//        user_settings->SetFoliageQuality(Widget_Index);
-//        break;
-//    case EOption_Type::EPT_Quality_Texture:
-//        user_settings->SetTextureQuality(Widget_Index);
-//        break;
-//    case EOption_Type::EPT_Quality_Shading:
-//        user_settings->SetShadingQuality(Widget_Index);
-//        break;
-//    case EOption_Type::EPT_Quality_Reflection:
-//        user_settings->SetReflectionQuality(Widget_Index);
-//        break;
-//    case EOption_Type::EPT_Quality_Anti_Aliasing:
-//        user_settings->SetAntiAliasingQuality(Widget_Index);
-//        break;
-//    case EOption_Type::EPT_Quality_Visual_Effects:
-//        user_settings->SetVisualEffectQuality(Widget_Index);
-//        break;
-//    case EOption_Type::EPT_Quality_View_Distances:
-//        user_settings->SetViewDistanceQuality(Widget_Index);
-//        break;
-//    case EOption_Type::EPT_Quality_Post_Processing:
-//        user_settings->SetPostProcessingQuality(Widget_Index);
-//        break;
-//    case EOption_Type::EPT_Quality_Global_Illumination_Quality:
-//        user_settings->SetGlobalIlluminationQuality(Widget_Index);
-//        break;
-//    case EOption_Type::EPT_Frame_Rate:
-//        user_settings->SetFrameRateLimit(30);
-//        break;
-//    case EOption_Type::EPT_Screen_Resolution:
-//        Set_Screen_Resolution();
-//        break;
-//    case EOption_Type::EPT_Screen_Percentage:
-//        Set_Screen_Percentage();
-//        break;
-//    case EOption_Type::EPT_Toogle_Directx:
-//        Toogle_DirectX();
-//        break;
-//    case EOption_Type::EPT_Show_Frame_Per_Sec:
-//        UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("stat fps") );  // Exit from game
-//        break;
-//    default:
-//        break;
-//    }
-//    user_settings->ApplySettings(false);
-//}
-////------------------------------------------------------------------------------------------------------------
+void UAMenu_Main_Settings::Button_Array_Emplace(const int button_index, UWidget *button_widget)
+{
+    Button_Array[button_index] = button_widget;
+}
+//------------------------------------------------------------------------------------------------------------
+void UAMenu_Main_Settings::Button_Active_Draw()
+{
+    int button_index = 0;
+    UGameUserSettings *user_settings;
+    UAMenu_Main_Setting_Button *menu_main_setting_button;
+
+    user_settings = GEngine->GetGameUserSettings();
+    if (!user_settings != 0)
+    return;
+
+    switch (Button_Type)
+    {
+    case EOption_Type::EPT_None:
+        break;
+    case EOption_Type::EPT_Window_Mode:
+        button_index = (EWindowMode::Type)user_settings->GetDefaultWindowMode();
+        break;
+    case EOption_Type::EPT_Quality_Presset:
+        button_index = user_settings->GetOverallScalabilityLevel();
+        break;
+    case EOption_Type::EPT_Quality_Shadows:
+        button_index = user_settings->GetShadowQuality();
+        break;
+    case EOption_Type::EPT_Quality_Foliage:
+        button_index = user_settings->GetFoliageQuality();
+        break;
+    case EOption_Type::EPT_Quality_Texture:
+        button_index = user_settings->GetTextureQuality();
+        break;
+    case EOption_Type::EPT_Quality_Shading:
+        button_index = user_settings->GetShadingQuality();
+        break;
+    case EOption_Type::EPT_Quality_Reflection:
+        button_index = user_settings->GetReflectionQuality();
+        break;
+    case EOption_Type::EPT_Quality_Anti_Aliasing:
+        button_index = user_settings->GetAntiAliasingQuality();
+        break;
+    case EOption_Type::EPT_Quality_Visual_Effects:
+        button_index = user_settings->GetVisualEffectQuality();
+        break;
+    case EOption_Type::EPT_Quality_View_Distances:
+        button_index = user_settings->GetViewDistanceQuality();
+        break;
+    case EOption_Type::EPT_Quality_Post_Processing:
+        button_index = user_settings->GetPostProcessingQuality();
+        break;
+    case EOption_Type::EPT_Quality_Global_Illumination_Quality:
+        button_index = user_settings->GetGlobalIlluminationQuality();
+        break;
+    case EOption_Type::EPT_Frame_Rate:  // !!!
+        //button_index = user_settings->GetDefaultWindowMode();
+        break;
+    case EOption_Type::EPT_Screen_Resolution:
+        //button_index = user_settings->GetDefaultWindowMode();
+        break;
+    case EOption_Type::EPT_Screen_Percentage:
+        //button_index = user_settings->GetDefaultWindowMode();
+        break;
+    case EOption_Type::EPT_Toogle_Directx:
+        //button_index = user_settings->GetDefaultWindowMode();
+        break;
+    case EOption_Type::EPT_Show_Frame_Per_Sec:
+        //button_index = user_settings->GetDefaultWindowMode();
+        break;
+    default:
+        button_index = 0;
+        break;
+    }
+    if (button_index > 5 || button_index < 0)
+        button_index = 0;
+    
+    menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(Button_Array[button_index] );
+    menu_main_setting_button->Button_Redraw();
+}
+//------------------------------------------------------------------------------------------------------------
 
 
 

@@ -43,6 +43,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable) void Init();
 	UFUNCTION(BlueprintCallable) void Update_State() const;
+	UFUNCTION(BlueprintNativeEvent) void Button_Redraw();
+	void Button_Redraw_Implementation();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Widget_Index;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) EOption_Type Option_Type;
@@ -60,6 +62,13 @@ UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Settings : public UUserWid
 
 public:
 	virtual void NativeConstruct();
+
+	UWidget *Button_Array[5];  // Stored Max 5 Buttons || 5 Buttons is Max
+
+	UFUNCTION(BlueprintCallable) void Button_Array_Emplace(const int button_index, UWidget *button_widget);  // Add Widget to Array
+	UFUNCTION(BlueprintCallable) void Button_Active_Draw();  // Add Widget to Array
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) EOption_Type Button_Type;
 };
 //-----------------------------------------------------------------------------------------------------------
 
