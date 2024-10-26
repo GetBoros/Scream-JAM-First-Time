@@ -56,6 +56,7 @@ public:
 
 
 // UADrag_Widget
+class USpinBox;
 UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Settings : public UUserWidget
 {
 	GENERATED_BODY()
@@ -65,10 +66,15 @@ public:
 
 	UWidget *Button_Array[5];  // Stored Max 5 Buttons || 5 Buttons is Max
 
+	UFUNCTION() void Func(float test);
+
 	UFUNCTION(BlueprintCallable) void Button_Array_Emplace(const int button_index, UWidget *button_widget);  // Add Widget to Array
 	UFUNCTION(BlueprintCallable) void Button_Active_Draw();  // Add Widget to Array
+	UFUNCTION(BlueprintCallable) void Button_Spin_Box_Update();  // Update Button marked with spinned box
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) bool Is_Spin_Box;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) EOption_Type Button_Type;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) USpinBox *Spin_Box_Root;
 };
 //-----------------------------------------------------------------------------------------------------------
 

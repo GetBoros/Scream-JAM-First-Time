@@ -1,5 +1,6 @@
 #include "JamScream_Game_Mode.h"
 
+#include "Components/SpinBox.h"
 #include "Misc/ConfigCacheIni.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameUserSettings.h"
@@ -166,6 +167,21 @@ void UAMenu_Main_Settings::NativeConstruct()
 	Super::NativeConstruct();
 }
 //------------------------------------------------------------------------------------------------------------
+void UAMenu_Main_Settings::Func(float test)
+{
+    UGameUserSettings *user_settings;
+
+    user_settings = GEngine->GetGameUserSettings();
+    Spin_Box_Root->SetValue(test);
+
+    if (Button_Type == EOption_Type::EPT_Frame_Rate)
+        user_settings->SetFrameRateLimit(test);
+    if (Button_Type == EOption_Type::EPT_Screen_Percentage)
+        user_settings->SetResolutionScaleNormalized(test);
+
+    user_settings->ApplySettings(false);
+}
+//------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Settings::Button_Array_Emplace(const int button_index, UWidget *button_widget)
 {
     Button_Array[button_index] = button_widget;
@@ -174,6 +190,7 @@ void UAMenu_Main_Settings::Button_Array_Emplace(const int button_index, UWidget 
 void UAMenu_Main_Settings::Button_Active_Draw()
 {
     int button_index = 0;
+    double temp = 0.0;
     UGameUserSettings *user_settings;
     UAMenu_Main_Setting_Button *menu_main_setting_button;
 
@@ -222,7 +239,9 @@ void UAMenu_Main_Settings::Button_Active_Draw()
         button_index = user_settings->GetGlobalIlluminationQuality();
         break;
     case EOption_Type::EPT_Frame_Rate:  // !!!
-        //button_index = user_settings->GetDefaultWindowMode();
+        temp = user_settings->GetFrameRateLimit();
+        Spin_Box_Root->SetValue(temp);
+        return;
         break;
     case EOption_Type::EPT_Screen_Resolution:
         //button_index = user_settings->GetDefaultWindowMode();
@@ -245,6 +264,24 @@ void UAMenu_Main_Settings::Button_Active_Draw()
     
     menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(Button_Array[button_index] );
     menu_main_setting_button->Button_Redraw();
+}
+//------------------------------------------------------------------------------------------------------------
+void UAMenu_Main_Settings::Button_Spin_Box_Update()
+{
+    UGameUserSettings *user_settings;
+
+    if (!Is_Spin_Box)
+        return;
+
+    user_settings = GEngine->GetGameUserSettings();
+    Spin_Box_Root->SetVisibility(ESlateVisibility::Visible);
+
+    if (Button_Type == EOption_Type::EPT_Frame_Rate)
+        Spin_Box_Root->SetValue(user_settings->GetFrameRateLimit());
+    if (Button_Type == EOption_Type::EPT_Screen_Percentage)
+        Spin_Box_Root->SetValue(user_settings->GetResolutionScaleNormalized() );
+
+    Spin_Box_Root->OnValueChanged.AddDynamic(this, &UAMenu_Main_Settings::Func);
 }
 //------------------------------------------------------------------------------------------------------------
 
