@@ -55,31 +55,7 @@ void UAMenu_Main_Setting_Button::Set_Screen_Resolution() const
     if (!user_settings != 0)
         return;
 
-    FIntPoint point{};
-
-    //switch (Widget_Index)
-    //{
-    //case 0:
-    //    point = FIntPoint(960, 540);
-    //    break;
-    //case 1:
-    //    point = FIntPoint(1280, 720);
-    //    break;
-    //case 2:
-    //    point = FIntPoint(1920, 1080);
-    //    break;
-    //case 3:
-    //    point = FIntPoint(2560, 1440);
-    //    break;
-    //case 4:
-    //    point = FIntPoint(3840, 2160);
-    //    break;
-    //default:
-    //    break;
-    //}
-    point = Menu_Main_Config::Resolution_Array[Widget_Index];
-
-    user_settings->SetScreenResolution(point);
+    user_settings->SetScreenResolution(Menu_Main_Config::Screen_Resolution_Array[Widget_Index]);
     user_settings->SetFullscreenMode(EWindowMode::Fullscreen);
     // Need redraw prev button
 }
@@ -93,14 +69,17 @@ void UAMenu_Main_Setting_Button::Init()
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Setting_Button::Update_State() const
 {
+    int i = 0;
     UGameUserSettings *user_settings = GEngine->GetGameUserSettings();
+    UAMenu_Main_Setting_Button *menu_main_setting_button = 0;
 
-        if (!user_settings != 0)
+    if (!user_settings != 0)
         return;
 
     switch (Option_Type)
     {
     case EOption_Type::EPT_None:
+        return;
         break;
     case EOption_Type::EPT_Window_Mode:
         user_settings->SetFullscreenMode(EWindowMode::ConvertIntToWindowMode(Widget_Index) );
@@ -157,10 +136,18 @@ void UAMenu_Main_Setting_Button::Update_State() const
     default:
         break;
     }
+ 
     user_settings->ApplySettings(false);
+    for (i = 0; i < 5; i++)
+    {
+        if (!(Buttons_Settings_Array[i] != 0) )
+            return;
+        menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(Buttons_Settings_Array[i]);
+        menu_main_setting_button->Button_Redraw(false);
+    }
 }
 //------------------------------------------------------------------------------------------------------------
-void UAMenu_Main_Setting_Button::Button_Redraw_Implementation()
+void UAMenu_Main_Setting_Button::Button_Redraw_Implementation(const bool is_active)
 {
     int yy = 0;  // Called if not released in BP
 }
@@ -175,7 +162,7 @@ void UAMenu_Main_Settings::NativeConstruct()
 	Super::NativeConstruct();
 }
 //------------------------------------------------------------------------------------------------------------
-void UAMenu_Main_Settings::Button_Pressed(float test)
+void UAMenu_Main_Settings::Handle_Spin_Box(float test)
 {
     UGameUserSettings *user_settings;
 
@@ -192,23 +179,30 @@ void UAMenu_Main_Settings::Button_Pressed(float test)
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Settings::Button_Array_Emplace(const int button_index, UWidget *button_widget)
 {
-    Button_Array[button_index] = button_widget;
+    UAMenu_Main_Setting_Button *menu_main_setting_button;
+
+    Button_Array[button_index] = button_widget;  // Store button widget ptr, use to redraw button
+    menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(button_widget);
+    menu_main_setting_button->Buttons_Settings_Array = Button_Array;  // store in button widget parent ptr
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Settings::Button_Active_Draw()
 {
-    int button_index = 0;
-    double temp = 0.0;
+    int i, button_index;
+    FIntPoint int_point;
     UGameUserSettings *user_settings;
     UAMenu_Main_Setting_Button *menu_main_setting_button;
-    FIntPoint array[5] = { {960, 540}, {1280, 720}, {1920, 1080}, {2560, 1440}, {3840, 2160} };
 
+    i = 0;
+    button_index = 0;
+    int_point = {};
     user_settings = GEngine->GetGameUserSettings();
     if (!user_settings != 0)
-    return;
+        return;
 
     switch (Button_Type)
-    {
+    {// For current button type have unique button setting
+
     case EOption_Type::EPT_None:
         break;
     case EOption_Type::EPT_Window_Mode:
@@ -247,22 +241,24 @@ void UAMenu_Main_Settings::Button_Active_Draw()
     case EOption_Type::EPT_Quality_Global_Illumination_Quality:
         button_index = user_settings->GetGlobalIlluminationQuality();
         break;
-    case EOption_Type::EPT_Screen_Resolution:  // !!! Make Constants
-        FIntPoint intpoint = user_settings->GetScreenResolution();
-        
-        for (size_t i = 0; i < 5; i++)
-            if (array[i] == intpoint)
+    case EOption_Type::EPT_Screen_Resolution:
+    {// Find current screen resolution | need to redraw current setting
+
+        int_point = user_settings->GetScreenResolution();
+        for (i = 0; i < Menu_Main_Config::Screen_Resolution_Array_Size; i++)
+            if (Menu_Main_Config::Screen_Resolution_Array[i] == int_point)
                 button_index = i;
         break;
+    }
     default:
         button_index = 0;
         break;
     }
+
     if (button_index > 5 || button_index < 0)
         button_index = 0;
-    
     menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(Button_Array[button_index] );
-    menu_main_setting_button->Button_Redraw();
+    menu_main_setting_button->Button_Redraw(true);
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Settings::Button_Spin_Box_Update()
@@ -287,7 +283,7 @@ void UAMenu_Main_Settings::Button_Spin_Box_Update()
         Spin_Box_Root->SetValue(user_settings->GetResolutionScaleNormalized());
     }
 
-    Spin_Box_Root->OnValueChanged.AddDynamic(this, &UAMenu_Main_Settings::Button_Pressed);
+    Spin_Box_Root->OnValueChanged.AddDynamic(this, &UAMenu_Main_Settings::Handle_Spin_Box);
 }
 //------------------------------------------------------------------------------------------------------------
 

@@ -31,7 +31,7 @@ UENUM(BlueprintType) enum class EOption_Type : uint8
 //-----------------------------------------------------------------------------------------------------------
 
 // UADrag_Widget
-UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Setting_Button : public UUserWidget
+UCLASS(meta = (DisableNativeTick) ) class JAMSCREAM_API UAMenu_Main_Setting_Button : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -42,14 +42,15 @@ public:
 	void Set_Screen_Percentage() const;
 	void Set_Screen_Resolution() const;
 	
-	
+	UWidget **Buttons_Settings_Array;
+
 	UFUNCTION(BlueprintCallable) void Init();
 	UFUNCTION(BlueprintCallable) void Update_State() const;
-	UFUNCTION(BlueprintNativeEvent) void Button_Redraw();
-	void Button_Redraw_Implementation();
+	UFUNCTION(BlueprintNativeEvent) void Button_Redraw(const bool is_active);
+	void Button_Redraw_Implementation(const bool is_active);  // Event in BP has name Button_Redraw
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Widget_Index;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) EOption_Type Option_Type;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Widget_Index;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) FText Button_Name;
 };
 //-----------------------------------------------------------------------------------------------------------
@@ -66,9 +67,9 @@ UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Settings : public UUserWid
 public:
 	virtual void NativeConstruct();
 
-	UWidget *Button_Array[5];  // Stored Max 5 Buttons || 5 Buttons is Max
+	UWidget *Button_Array[Menu_Main_Config::Button_Setting_Count] {};  // Stored Max 5 Buttons || 5 Buttons is Max
 
-	UFUNCTION() void Button_Pressed(float test);
+	UFUNCTION() void Handle_Spin_Box(float test);
 
 	UFUNCTION(BlueprintCallable) void Button_Array_Emplace(const int button_index, UWidget *button_widget);  // Add Widget to Array
 	UFUNCTION(BlueprintCallable) void Button_Active_Draw();  // Add Widget to Array

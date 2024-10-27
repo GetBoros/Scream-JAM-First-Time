@@ -7,7 +7,8 @@ public:
     ~Menu_Main_Config();
     Menu_Main_Config();
 
-    static constexpr int Resolution_Array_Count = 5;
-    static const FIntPoint Resolution_Array[Resolution_Array_Count];
+    static constexpr int Button_Setting_Count = 5;
+    static constexpr int Screen_Resolution_Array_Size = 5;
+    static const FIntPoint Screen_Resolution_Array[Screen_Resolution_Array_Size];
 };
 //-----------------------------------------------------------------------------------------------------------
