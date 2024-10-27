@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Menu_Main_Config.h"
+
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/GameModeBase.h"
 #include "JamScream_Game_Mode.generated.h"
@@ -66,7 +68,7 @@ public:
 
 	UWidget *Button_Array[5];  // Stored Max 5 Buttons || 5 Buttons is Max
 
-	UFUNCTION() void Func(float test);
+	UFUNCTION() void Button_Pressed(float test);
 
 	UFUNCTION(BlueprintCallable) void Button_Array_Emplace(const int button_index, UWidget *button_widget);  // Add Widget to Array
 	UFUNCTION(BlueprintCallable) void Button_Active_Draw();  // Add Widget to Array
@@ -74,6 +76,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) bool Is_Spin_Box;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) EOption_Type Button_Type;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) TSubclassOf<UUserWidget> Button_Class;;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) USpinBox *Spin_Box_Root;
 };
 //-----------------------------------------------------------------------------------------------------------

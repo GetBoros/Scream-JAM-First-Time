@@ -51,29 +51,37 @@ void UAMenu_Main_Setting_Button::Set_Screen_Percentage() const
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Setting_Button::Set_Screen_Resolution() const
 {
-    FIntPoint point {};
-    
     UGameUserSettings *user_settings = GEngine->GetGameUserSettings();
     if (!user_settings != 0)
         return;
 
-    switch (Widget_Index)
-    {
-    case 0:
-        point = FIntPoint(960, 540);
-        break;
-    case 1:
-        point = FIntPoint(1280, 720);
-        break;
-    case 2:
-        point = FIntPoint(1920, 1080);
-        break;
-    default:
-        point = FIntPoint(960, 540);
-        break;
-    }
+    FIntPoint point{};
+
+    //switch (Widget_Index)
+    //{
+    //case 0:
+    //    point = FIntPoint(960, 540);
+    //    break;
+    //case 1:
+    //    point = FIntPoint(1280, 720);
+    //    break;
+    //case 2:
+    //    point = FIntPoint(1920, 1080);
+    //    break;
+    //case 3:
+    //    point = FIntPoint(2560, 1440);
+    //    break;
+    //case 4:
+    //    point = FIntPoint(3840, 2160);
+    //    break;
+    //default:
+    //    break;
+    //}
+    point = Menu_Main_Config::Resolution_Array[Widget_Index];
+
     user_settings->SetScreenResolution(point);
     user_settings->SetFullscreenMode(EWindowMode::Fullscreen);
+    // Need redraw prev button
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Setting_Button::Init()
@@ -167,18 +175,18 @@ void UAMenu_Main_Settings::NativeConstruct()
 	Super::NativeConstruct();
 }
 //------------------------------------------------------------------------------------------------------------
-void UAMenu_Main_Settings::Func(float test)
+void UAMenu_Main_Settings::Button_Pressed(float test)
 {
     UGameUserSettings *user_settings;
 
     user_settings = GEngine->GetGameUserSettings();
-    Spin_Box_Root->SetValue(test);
 
     if (Button_Type == EOption_Type::EPT_Frame_Rate)
-        user_settings->SetFrameRateLimit(test);
+        user_settings->SetFrameRateLimit(FMath::Clamp(test, 24.0f, 144.0f) );
     if (Button_Type == EOption_Type::EPT_Screen_Percentage)
-        user_settings->SetResolutionScaleNormalized(test);
+        user_settings->SetResolutionScaleNormalized(FMath::Clamp(test, 0.2f, 1.0f) );
 
+    Spin_Box_Root->SetValue(test);
     user_settings->ApplySettings(false);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -193,6 +201,7 @@ void UAMenu_Main_Settings::Button_Active_Draw()
     double temp = 0.0;
     UGameUserSettings *user_settings;
     UAMenu_Main_Setting_Button *menu_main_setting_button;
+    FIntPoint array[5] = { {960, 540}, {1280, 720}, {1920, 1080}, {2560, 1440}, {3840, 2160} };
 
     user_settings = GEngine->GetGameUserSettings();
     if (!user_settings != 0)
@@ -238,22 +247,12 @@ void UAMenu_Main_Settings::Button_Active_Draw()
     case EOption_Type::EPT_Quality_Global_Illumination_Quality:
         button_index = user_settings->GetGlobalIlluminationQuality();
         break;
-    case EOption_Type::EPT_Frame_Rate:  // !!!
-        temp = user_settings->GetFrameRateLimit();
-        Spin_Box_Root->SetValue(temp);
-        return;
-        break;
-    case EOption_Type::EPT_Screen_Resolution:
-        //button_index = user_settings->GetDefaultWindowMode();
-        break;
-    case EOption_Type::EPT_Screen_Percentage:
-        //button_index = user_settings->GetDefaultWindowMode();
-        break;
-    case EOption_Type::EPT_Toogle_Directx:
-        //button_index = user_settings->GetDefaultWindowMode();
-        break;
-    case EOption_Type::EPT_Show_Frame_Per_Sec:
-        //button_index = user_settings->GetDefaultWindowMode();
+    case EOption_Type::EPT_Screen_Resolution:  // !!! Make Constants
+        FIntPoint intpoint = user_settings->GetScreenResolution();
+        
+        for (size_t i = 0; i < 5; i++)
+            if (array[i] == intpoint)
+                button_index = i;
         break;
     default:
         button_index = 0;
@@ -277,11 +276,18 @@ void UAMenu_Main_Settings::Button_Spin_Box_Update()
     Spin_Box_Root->SetVisibility(ESlateVisibility::Visible);
 
     if (Button_Type == EOption_Type::EPT_Frame_Rate)
-        Spin_Box_Root->SetValue(user_settings->GetFrameRateLimit());
+        Spin_Box_Root->SetValue(user_settings->GetFrameRateLimit() );
     if (Button_Type == EOption_Type::EPT_Screen_Percentage)
-        Spin_Box_Root->SetValue(user_settings->GetResolutionScaleNormalized() );
+    {
+        Spin_Box_Root->SetMinValue(0.0f);
+        Spin_Box_Root->SetMaxValue(1.0f);
+        Spin_Box_Root->SetMinSliderValue(0.1f);
+        Spin_Box_Root->SetMaxSliderValue(1.0f);
+        Spin_Box_Root->SetToolTipText(FText::FromString("From 0.0 to 1.0") );
+        Spin_Box_Root->SetValue(user_settings->GetResolutionScaleNormalized());
+    }
 
-    Spin_Box_Root->OnValueChanged.AddDynamic(this, &UAMenu_Main_Settings::Func);
+    Spin_Box_Root->OnValueChanged.AddDynamic(this, &UAMenu_Main_Settings::Button_Pressed);
 }
 //------------------------------------------------------------------------------------------------------------
 
