@@ -30,36 +30,47 @@ UENUM(BlueprintType) enum class EOption_Type : uint8
 };
 //-----------------------------------------------------------------------------------------------------------
 
-// UADrag_Widget
-UCLASS(meta = (DisableNativeTick) ) class JAMSCREAM_API UAMenu_Main_Setting_Button : public UUserWidget
+
+
+
+// UAMenu_Main_Setting_Button
+class UTextBlock;
+class UButton;
+//-----------------------------------------------------------------------------------------------------------
+UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Setting_Button : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
 	virtual void NativeConstruct();
 
+	void Init();
+
 	void Toogle_DirectX() const;
 	void Set_Screen_Percentage() const;
 	void Set_Screen_Resolution() const;
-	
+
 	UWidget **Buttons_Settings_Array;
 
-	UFUNCTION(BlueprintCallable) void Init();
-	UFUNCTION(BlueprintCallable) void Update_State() const;
-	UFUNCTION(BlueprintNativeEvent) void Button_Redraw(const bool is_active);
-	void Button_Redraw_Implementation(const bool is_active);  // Event in BP has name Button_Redraw
+	void Update_State() const;
+	UFUNCTION(BlueprintCallable) void Set_Button_State(bool is_button_active);
+	UFUNCTION() void Button_Pressed();  // OnButtonPressed event
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) EOption_Type Option_Type;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Widget_Index;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) FText Button_Name;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) UButton *Button;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) UTextBlock *Button_Text;
+
 };
 //-----------------------------------------------------------------------------------------------------------
 
 
 
 
-// UADrag_Widget
+// UAMenu_Main_Settings
 class USpinBox;
+//-----------------------------------------------------------------------------------------------------------
 UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Settings : public UUserWidget
 {
 	GENERATED_BODY()
@@ -81,8 +92,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) USpinBox *Spin_Box_Root;
 };
 //-----------------------------------------------------------------------------------------------------------
-
-
 
 
 

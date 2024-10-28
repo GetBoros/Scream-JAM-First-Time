@@ -1,5 +1,7 @@
 #include "JamScream_Game_Mode.h"
 
+#include "Components/TextBlock.h"
+#include "Components/Button.h"
 #include "Components/SpinBox.h"
 #include "Misc/ConfigCacheIni.h"
 #include "Kismet/GameplayStatics.h"
@@ -9,6 +11,18 @@
 void UAMenu_Main_Setting_Button::NativeConstruct()
 {
     Super::NativeConstruct();
+    Init();
+}
+//------------------------------------------------------------------------------------------------------------
+void UAMenu_Main_Setting_Button::Init()
+{
+    if (Button_Name.IsEmpty() )  // If not added name use default name
+        Button_Name = FText::FromName(Menu_Main_Config::Button_Name_Defaults[Widget_Index]);  // Set Name | Default Buttons
+    Button_Text->SetText(Button_Name);  // Set Name to Button in curr widget
+
+    if (!Button != 0)  // if don`t excist don`t bind button
+        return;
+    Button->OnPressed.AddDynamic(this, &UAMenu_Main_Setting_Button::Button_Pressed);
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Setting_Button::Toogle_DirectX() const
@@ -60,11 +74,9 @@ void UAMenu_Main_Setting_Button::Set_Screen_Resolution() const
     // Need redraw prev button
 }
 //------------------------------------------------------------------------------------------------------------
-void UAMenu_Main_Setting_Button::Init()
+void UAMenu_Main_Setting_Button::Set_Button_State(bool is_button_active)
 {
-    FName names[5] = { L"1", L"2", L"3", L"4", L"5"};  // !!! To Config
-    if (Button_Name.IsEmpty() )
-        Button_Name = FText::FromName(names[Widget_Index]);  // Set Name | Default Buttons
+    Button->SetBackgroundColor(is_button_active ? Menu_Main_Config::Button_Active : Menu_Main_Config::Button_Inactive);
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Setting_Button::Update_State() const
@@ -143,13 +155,14 @@ void UAMenu_Main_Setting_Button::Update_State() const
         if (!(Buttons_Settings_Array[i] != 0) )
             return;
         menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(Buttons_Settings_Array[i]);
-        menu_main_setting_button->Button_Redraw(false);
+        menu_main_setting_button->Set_Button_State(false);
     }
 }
 //------------------------------------------------------------------------------------------------------------
-void UAMenu_Main_Setting_Button::Button_Redraw_Implementation(const bool is_active)
+void UAMenu_Main_Setting_Button::Button_Pressed()
 {
-    int yy = 0;  // Called if not released in BP
+    Update_State();
+    Set_Button_State(true);
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -258,7 +271,7 @@ void UAMenu_Main_Settings::Button_Active_Draw()
     if (button_index > 5 || button_index < 0)
         button_index = 0;
     menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(Button_Array[button_index] );
-    menu_main_setting_button->Button_Redraw(true);
+    menu_main_setting_button->Set_Button_State(true);
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Settings::Button_Spin_Box_Update()
