@@ -70,6 +70,7 @@ public:
 
 // UAMenu_Main_Settings
 class USpinBox;
+class UHorizontalBox;
 //-----------------------------------------------------------------------------------------------------------
 UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Settings : public UUserWidget
 {
@@ -85,11 +86,22 @@ public:
 	UFUNCTION(BlueprintCallable) void Button_Array_Emplace(const int button_index, UWidget *button_widget);  // Add Widget to Array
 	UFUNCTION(BlueprintCallable) void Button_Active_Draw();  // Add Widget to Array
 	UFUNCTION(BlueprintCallable) void Button_Spin_Box_Update();  // Update Button marked with spinned box
+	UFUNCTION(BlueprintCallable) void Temp();  // Update Button marked with spinned box
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) bool Is_Spin_Box;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Buttons_Count;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) EOption_Type Button_Type;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) TSubclassOf<UUserWidget> Button_Class;;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) TSubclassOf<UUserWidget> Button_Class;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) FText Menu_Settings_Text;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) TArray<FText> Buttons_Name;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) UTextBlock *Menu_Settings_Name;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) UHorizontalBox *Horizontal_Box_List;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) USpinBox *Spin_Box_Root;
+
+	// TEMP
+	//UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) TSubclassOf<UUserWidget> Button_Class;
+	// TEMP END
 };
 //-----------------------------------------------------------------------------------------------------------
 

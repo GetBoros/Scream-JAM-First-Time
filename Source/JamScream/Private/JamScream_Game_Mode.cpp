@@ -1,5 +1,6 @@
 #include "JamScream_Game_Mode.h"
 
+#include "Components/HorizontalBox.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/SpinBox.h"
@@ -173,6 +174,12 @@ void UAMenu_Main_Setting_Button::Button_Pressed()
 void UAMenu_Main_Settings::NativeConstruct()
 {
 	Super::NativeConstruct();
+    Menu_Settings_Name->SetText(Menu_Settings_Text);
+    Buttons_Name.Reserve(Buttons_Count);
+    Spin_Box_Root->SetVisibility(ESlateVisibility::Collapsed);
+    Temp();
+    Button_Active_Draw();
+
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Settings::Handle_Spin_Box(float test)
@@ -270,7 +277,9 @@ void UAMenu_Main_Settings::Button_Active_Draw()
 
     if (button_index > 5 || button_index < 0)
         button_index = 0;
-    menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(Button_Array[button_index] );
+    if (!(Button_Array != 0) )
+        return;
+    menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(Button_Array[button_index] );  // !!! Empty
     menu_main_setting_button->Set_Button_State(true);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -297,6 +306,37 @@ void UAMenu_Main_Settings::Button_Spin_Box_Update()
     }
 
     Spin_Box_Root->OnValueChanged.AddDynamic(this, &UAMenu_Main_Settings::Handle_Spin_Box);
+}
+//------------------------------------------------------------------------------------------------------------
+void UAMenu_Main_Settings::Temp()
+{
+    int i = 0;
+    UAMenu_Main_Setting_Button *array_buttons[5] {};
+
+    if (true)
+        return;
+
+    if (!Is_Spin_Box)
+    {// If not spin box create buttons
+
+        for (i = 0; i < Buttons_Count; i++)
+        {// Create Widgets and to horizontal box list, add to array
+
+            array_buttons[i] = CreateWidget<UAMenu_Main_Setting_Button>(this, Button_Class);
+            if (!(array_buttons[i] != 0) )
+                return;
+
+            array_buttons[i]->Option_Type = Button_Type;
+            array_buttons[i]->Widget_Index = i;
+            if (!Buttons_Name[i].IsEmpty() )
+                array_buttons[i]->Button_Name = Buttons_Name[i];
+            
+            Horizontal_Box_List->AddChild(array_buttons[i]);  // Add widget as child to horrizontal box
+            Button_Array_Emplace(i, array_buttons[i]);  // !!! Debug here F9 
+        }
+    }
+    else
+        Button_Spin_Box_Update();
 }
 //------------------------------------------------------------------------------------------------------------
 
