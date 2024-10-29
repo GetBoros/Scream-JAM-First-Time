@@ -80,6 +80,7 @@ public:
 	virtual void NativeConstruct();
 
 	void Init();
+	void Clear_Memmory();
 
 	void Button_Create_Default();
 
