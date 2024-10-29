@@ -79,14 +79,14 @@ UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Settings : public UUserWid
 public:
 	virtual void NativeConstruct();
 
-	UWidget *Button_Array[Menu_Main_Config::Button_Setting_Count] {};  // Stored Max 5 Buttons || 5 Buttons is Max
+	UWidget *Button_Array[Menu_Main_Config::Button_Setting_Count] {};  // !!! Mem leak | Stored Max 5 Buttons || 5 Buttons is Max
 
 	UFUNCTION() void Handle_Spin_Box(float test);
 
 	UFUNCTION(BlueprintCallable) void Button_Array_Emplace(const int button_index, UWidget *button_widget);  // Add Widget to Array
 	UFUNCTION(BlueprintCallable) void Button_Active_Draw();  // Add Widget to Array
 	UFUNCTION(BlueprintCallable) void Button_Spin_Box_Update();  // Update Button marked with spinned box
-	UFUNCTION(BlueprintCallable) void Temp();  // Update Button marked with spinned box
+	UFUNCTION(BlueprintCallable) void Temp();  // Create buttons array | Init them | 
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) bool Is_Spin_Box;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Buttons_Count;
