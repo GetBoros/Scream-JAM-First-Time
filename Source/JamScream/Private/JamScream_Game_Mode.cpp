@@ -173,26 +173,43 @@ void UAMenu_Main_Setting_Button::Button_Pressed()
 // UAMenu_Main_Settings
 void UAMenu_Main_Settings::NativeConstruct()
 {
-    int i = 0;
 	
     Super::NativeConstruct();
 
+    Init();
+}
+//------------------------------------------------------------------------------------------------------------
+void UAMenu_Main_Settings::Init()
+{
+
     Menu_Settings_Name->SetText(Menu_Settings_Text);  // Set Setting Name
     Spin_Box_Root->SetVisibility(ESlateVisibility::Collapsed);  // Hide if not check in BP
+
     if (Is_Spin_Box)
         Button_Spin_Box_Update();  // Init Spin Box settings
     else
-    {
-        if (Buttons_Name.Num() < 1)  // If names was added in BP 
-        {
-            Buttons_Name.SetNum(Buttons_Count);  // if don`t create and add default elemts
-            for (i = 0; i < Buttons_Count; i++)
-                Buttons_Name[i] = FText::FromName(Menu_Main_Config::Button_Name_Defaults[i]);
-        }
-        Temp();
-    }
+        Button_Create_Default();
+}
+//------------------------------------------------------------------------------------------------------------
+void UAMenu_Main_Settings::Button_Create_Default()
+{
+    int i = 0;
+    UAMenu_Main_Setting_Button *array_buttons[Menu_Main_Config::Button_Setting_Count]{};  // !!! Mem leak
 
-    //Button_Active_Draw();  // Activate buttons useing settings
+    if (Buttons_Name.Num() < 1)  // If names was added in BP
+        Buttons_Name.SetNum(Buttons_Count);  // if don`t create and add default elemts
+
+    for (i = 0; i < Buttons_Count; i++)
+    {
+        Buttons_Name[i] = FText::FromName(Menu_Main_Config::Button_Name_Defaults[i]);  // !!! if not default it`s don`t needed
+        array_buttons[i] = CreateWidget<UAMenu_Main_Setting_Button>(this, Button_Class);
+        array_buttons[i]->Option_Type = Button_Type;
+        array_buttons[i]->Widget_Index = i;
+        array_buttons[i]->Button_Name = Buttons_Name[i];
+
+        Horizontal_Box_List->AddChild(array_buttons[i]);  // Add widget as child to horrizontal box
+        Button_Array_Emplace(i, array_buttons[i]);  // !!! Debug here F9 
+    }
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Settings::Handle_Spin_Box(float test)
@@ -319,24 +336,6 @@ void UAMenu_Main_Settings::Button_Spin_Box_Update()
     }
 
     Spin_Box_Root->OnValueChanged.AddDynamic(this, &UAMenu_Main_Settings::Handle_Spin_Box);
-}
-//------------------------------------------------------------------------------------------------------------
-void UAMenu_Main_Settings::Temp()
-{
-    int i = 0;
-    UAMenu_Main_Setting_Button *array_buttons[Menu_Main_Config::Button_Setting_Count] {};  // !!! Mem leak
-
-    for (i = 0; i < Buttons_Count; i++)
-    {// Create Widgets and to horizontal box list, add to array
-
-        array_buttons[i] = CreateWidget<UAMenu_Main_Setting_Button>(this, Button_Class);
-        array_buttons[i]->Option_Type = Button_Type;
-        array_buttons[i]->Widget_Index = i;
-        array_buttons[i]->Button_Name = Buttons_Name[i];
-
-        Horizontal_Box_List->AddChild(array_buttons[i]);  // Add widget as child to horrizontal box
-        Button_Array_Emplace(i, array_buttons[i]);  // !!! Debug here F9 
-    }
 }
 //------------------------------------------------------------------------------------------------------------
 
