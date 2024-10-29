@@ -42,15 +42,17 @@ UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Setting_Button : public UU
 	GENERATED_BODY()
 
 public:
+	~UAMenu_Main_Setting_Button();
 	virtual void NativeConstruct();
 
 	void Init();
+	void Button_Free_Memmory();  // Say Garbage Collector to destroy this object
 
 	void Toogle_DirectX() const;
 	void Set_Screen_Percentage() const;
 	void Set_Screen_Resolution() const;
 
-	UWidget **Buttons_Settings_Array;
+	UAMenu_Main_Setting_Button **Buttons_Settings_Array {};
 
 	void Update_State() const;
 	UFUNCTION(BlueprintCallable) void Set_Button_State(bool is_button_active);
@@ -84,7 +86,7 @@ public:
 
 	void Button_Create_Default();
 
-	UWidget *Button_Array[Menu_Main_Config::Button_Setting_Count] {};  // !!! Mem leak | Stored Max 5 Buttons || 5 Buttons is Max
+	UAMenu_Main_Setting_Button *Button_Array[Menu_Main_Config::Button_Setting_Count] {};  // !!! Mem leak | Stored Max 5 Buttons || 5 Buttons is Max
 
 	UFUNCTION() void Handle_Spin_Box(float test);
 

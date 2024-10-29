@@ -8,6 +8,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameUserSettings.h"
 
+UAMenu_Main_Setting_Button::~UAMenu_Main_Setting_Button()
+{
+}
+
 // UAMenu_Main_Setting_Button
 void UAMenu_Main_Setting_Button::NativeConstruct()
 {
@@ -24,6 +28,16 @@ void UAMenu_Main_Setting_Button::Init()
     if (!Button != 0)  // if don`t excist don`t bind button
         return;
     Button->OnPressed.AddDynamic(this, &UAMenu_Main_Setting_Button::Button_Pressed);
+}
+//------------------------------------------------------------------------------------------------------------
+void UAMenu_Main_Setting_Button::Button_Free_Memmory()
+{
+    if ( !(Buttons_Settings_Array != 0) )
+        return;
+
+    Buttons_Settings_Array[Widget_Index]->RemoveFromParent();  // Удаляет виджет из иерархии, если он был добавлен
+    Buttons_Settings_Array[Widget_Index]->ConditionalBeginDestroy();  // Начинает процесс уничтожения объекта, если на него больше нет ссылок
+    Buttons_Settings_Array[Widget_Index] = 0;  // Очищаем указатель, чтобы избежать dangling указателей
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Setting_Button::Toogle_DirectX() const
@@ -84,7 +98,6 @@ void UAMenu_Main_Setting_Button::Update_State() const
 {
     int i = 0;
     UGameUserSettings *user_settings = GEngine->GetGameUserSettings();
-    UAMenu_Main_Setting_Button *menu_main_setting_button = 0;
 
     if (!user_settings != 0)
         return;
@@ -155,8 +168,7 @@ void UAMenu_Main_Setting_Button::Update_State() const
     {
         if (!(Buttons_Settings_Array[i] != 0) )
             return;
-        menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(Buttons_Settings_Array[i]);
-        menu_main_setting_button->Set_Button_State(false);
+        Buttons_Settings_Array[i]->Set_Button_State(false);
     }
 }
 //------------------------------------------------------------------------------------------------------------
@@ -173,7 +185,6 @@ void UAMenu_Main_Setting_Button::Button_Pressed()
 // UAMenu_Main_Settings
 void UAMenu_Main_Settings::NativeConstruct()
 {
-	
     Super::NativeConstruct();
 
     Init();
@@ -181,7 +192,6 @@ void UAMenu_Main_Settings::NativeConstruct()
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Settings::Init()
 {
-
     Menu_Settings_Name->SetText(Menu_Settings_Text);  // Set Setting Name
     Spin_Box_Root->SetVisibility(ESlateVisibility::Collapsed);  // Hide if not check in BP
 
@@ -200,7 +210,6 @@ void UAMenu_Main_Settings::Clear_Memmory()
 void UAMenu_Main_Settings::Button_Create_Default()
 {
     int i = 0;
-    UAMenu_Main_Setting_Button *array_buttons[Menu_Main_Config::Button_Setting_Count]{};  // !!! Mem leak
 
     if (Buttons_Name.Num() < 1)  // If names was added in BP
     {
@@ -210,16 +219,14 @@ void UAMenu_Main_Settings::Button_Create_Default()
 
     for (i = 0; i < Buttons_Count; i++)
     {
-        array_buttons[i] = CreateWidget<UAMenu_Main_Setting_Button>(this, Button_Class);
-        array_buttons[i]->Option_Type = Button_Type;
-        array_buttons[i]->Widget_Index = i;
-        array_buttons[i]->Button_Name = Buttons_Name[i];
-
-        Horizontal_Box_List->AddChild(array_buttons[i]);  // Add widget as child to horrizontal box
-
-        Button_Array[i] = array_buttons[i];
-        array_buttons[i]->Buttons_Settings_Array = Button_Array;
+        Button_Array[i] = CreateWidget<UAMenu_Main_Setting_Button>(this, Button_Class);
+        Button_Array[i]->Option_Type = Button_Type;
+        Button_Array[i]->Widget_Index = i;
+        Button_Array[i]->Button_Name = Buttons_Name[i];
+        Button_Array[i]->Buttons_Settings_Array = Button_Array;
+        Horizontal_Box_List->AddChild(Button_Array[i]);  // Add widget as child to horrizontal box
     }
+    Button_Active_Draw();
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Settings::Handle_Spin_Box(float test)
@@ -239,11 +246,11 @@ void UAMenu_Main_Settings::Handle_Spin_Box(float test)
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Settings::Button_Array_Emplace(const int button_index, UWidget *button_widget)
 {
-    UAMenu_Main_Setting_Button *menu_main_setting_button;
+    //UAMenu_Main_Setting_Button *menu_main_setting_button;
 
-    Button_Array[button_index] = button_widget;  // Store button widget ptr, use to redraw button
-    menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(button_widget);
-    menu_main_setting_button->Buttons_Settings_Array = Button_Array;  // store in button widget parent ptr
+    //Button_Array[button_index] = button_widget;  // Store button widget ptr, use to redraw button
+    //menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(button_widget);
+    //menu_main_setting_button->Buttons_Settings_Array = Button_Array;  // store in button widget parent ptr
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Settings::Button_Active_Draw()
@@ -251,7 +258,6 @@ void UAMenu_Main_Settings::Button_Active_Draw()
     int i, button_index;
     FIntPoint int_point;
     UGameUserSettings *user_settings;
-    UAMenu_Main_Setting_Button *menu_main_setting_button;
 
     i = 0;
     button_index = 0;
@@ -317,10 +323,9 @@ void UAMenu_Main_Settings::Button_Active_Draw()
 
     if (button_index > 5 || button_index < 0)
         button_index = 0;
-    if (!(Button_Array != 0) )
+    if ( !(Button_Array != 0) )
         return;
-    menu_main_setting_button = Cast<UAMenu_Main_Setting_Button>(Button_Array[button_index] );  // !!! Empty
-    menu_main_setting_button->Set_Button_State(true);
+    Button_Array[button_index]->Set_Button_State(true);
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Settings::Button_Spin_Box_Update()
