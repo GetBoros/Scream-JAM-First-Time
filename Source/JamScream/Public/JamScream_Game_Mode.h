@@ -6,6 +6,9 @@
 #include "GameFramework/GameModeBase.h"
 #include "JamScream_Game_Mode.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FButton_Settings_Pressed, int32, button_index);  // Need F First used to bind in bp
+//DECLARE_DELEGATE_OneParam(DButton_Settings_Pressed, int32);  // If use only CPP
+
 // EOption_Type
 UENUM(BlueprintType) enum class EOption_Type : uint8
 {
@@ -47,19 +50,18 @@ public:
 	EOption_Type Option_Type;  // Button type
 	UAMenu_Main_Setting_Button **Buttons_Settings_Array {};  // Ptr to the same button in same setting sections
 
-	UFUNCTION(BlueprintCallable) void Set_Button_State(bool is_button_active);  // !!! Used in Menu Option
-	UFUNCTION() void Button_Pressed();  // OnButtonPressed event need UFunc
+	UFUNCTION(BlueprintCallable) void Button_Draw_Background(bool is_button_active);  // !!! Used in Menu Option
+	UFUNCTION() void Button_Pressed();  // On Button Pressed event need UFunc
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Widget_Index;  // prop need in Menu Option
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) FText Button_Name;  // same as above
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) UButton *Button;  // Handle Pressed
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) UTextBlock *Button_Text_Block;  // Text in Button
+	UPROPERTY(BlueprintAssignable, Category = "Event") FButton_Settings_Pressed Button_Settings_Pressed;  // Need broadcast | all binded receive broadcasts
 
 private:
 	void Button_Free_Memmory();  // Say Garbage Collector to destroy this object
 	void Toogle_DirectX() const;
-	void Set_Screen_Percentage() const;
-	void Set_Screen_Resolution() const;
 	void Update_State() const;  // Apply settings to game
 };
 //-----------------------------------------------------------------------------------------------------------
@@ -92,13 +94,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) USpinBox *Spin_Box_Root;
 
 private:
-	void Clear_Memmory();  // !!!
 	void Button_Create_Default();
 
-	void Button_Array_Emplace(const int button_index, UWidget* button_widget);  // Add Widget to Array
 	void Button_Active_Draw();  // Add Widget to Array
 	void Button_Spin_Box_Update();  // Update Button marked with spinned box
 
+	UGameUserSettings *User_Settings;
 	UAMenu_Main_Setting_Button *Button_Array[Menu_Main_Config::Button_Setting_Count] {};  // !!! Mem leak | Stored Max 5 Buttons || 5 Buttons is Max
 };
 //-----------------------------------------------------------------------------------------------------------
@@ -115,12 +116,3 @@ public:
 	AJamScream_Game_Mode();
 };
 //-----------------------------------------------------------------------------------------------------------
-
-
-
-
-// TASKS
-/*
-X	- Current ploblem :
-		- Have delegate from button to menumainoption, need cancel those
-*/
