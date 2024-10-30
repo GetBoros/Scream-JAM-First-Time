@@ -8,22 +8,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameUserSettings.h"
 
-UAMenu_Main_Setting_Button::~UAMenu_Main_Setting_Button()
-{
-}
-
 // UAMenu_Main_Setting_Button
 void UAMenu_Main_Setting_Button::NativeConstruct()
 {
     Super::NativeConstruct();
-    Init();
-}
-//------------------------------------------------------------------------------------------------------------
-void UAMenu_Main_Setting_Button::Init()
-{
     if (Button_Name.IsEmpty() )  // If not added name use default name
         Button_Name = FText::FromName(Menu_Main_Config::Button_Name_Defaults[Widget_Index]);  // Set Name | Default Buttons
-    Button_Text->SetText(Button_Name);  // Set Name to Button in curr widget
+    Button_Text_Block->SetText(Button_Name);  // Set Name to Button in curr widget
 
     if (!Button != 0)  // if don`t excist don`t bind button
         return;
@@ -87,11 +78,6 @@ void UAMenu_Main_Setting_Button::Set_Screen_Resolution() const
     user_settings->SetScreenResolution(Menu_Main_Config::Screen_Resolution_Array[Widget_Index]);
     user_settings->SetFullscreenMode(EWindowMode::Fullscreen);
     // Need redraw prev button
-}
-//------------------------------------------------------------------------------------------------------------
-void UAMenu_Main_Setting_Button::Set_Button_State(bool is_button_active)
-{
-    Button->SetBackgroundColor(is_button_active ? Menu_Main_Config::Button_Active : Menu_Main_Config::Button_Inactive);
 }
 //------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Setting_Button::Update_State() const
@@ -172,10 +158,15 @@ void UAMenu_Main_Setting_Button::Update_State() const
     }
 }
 //------------------------------------------------------------------------------------------------------------
+void UAMenu_Main_Setting_Button::Set_Button_State(bool is_button_active)
+{
+    Button->SetBackgroundColor(is_button_active ? Menu_Main_Config::Button_Active : Menu_Main_Config::Button_Inactive);
+}
+//------------------------------------------------------------------------------------------------------------
 void UAMenu_Main_Setting_Button::Button_Pressed()
 {
-    Update_State();
-    Set_Button_State(true);
+    Update_State();  // Apply changes
+    Set_Button_State(true);  // Show pressed button
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -187,15 +178,10 @@ void UAMenu_Main_Settings::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    Init();
-}
-//------------------------------------------------------------------------------------------------------------
-void UAMenu_Main_Settings::Init()
-{
     Menu_Settings_Name->SetText(Menu_Settings_Text);  // Set Setting Name
     Spin_Box_Root->SetVisibility(ESlateVisibility::Collapsed);  // Hide if not check in BP
 
-    if (Is_Spin_Box)
+    if (Is_Button_Spin_Box)
         Button_Spin_Box_Update();  // Init Spin Box settings
     else
         Button_Create_Default();
@@ -332,7 +318,7 @@ void UAMenu_Main_Settings::Button_Spin_Box_Update()
 {
     UGameUserSettings *user_settings;
 
-    if (!Is_Spin_Box)
+    if (!Is_Button_Spin_Box)
         return;
 
     user_settings = GEngine->GetGameUserSettings();

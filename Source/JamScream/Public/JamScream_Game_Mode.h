@@ -42,28 +42,25 @@ UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Setting_Button : public UU
 	GENERATED_BODY()
 
 public:
-	~UAMenu_Main_Setting_Button();
 	virtual void NativeConstruct();
 
-	void Init();
-	void Button_Free_Memmory();  // Say Garbage Collector to destroy this object
+	EOption_Type Option_Type;  // Button type
+	UAMenu_Main_Setting_Button **Buttons_Settings_Array {};  // Ptr to the same button in same setting sections
 
+	UFUNCTION(BlueprintCallable) void Set_Button_State(bool is_button_active);  // !!! Used in Menu Option
+	UFUNCTION() void Button_Pressed();  // OnButtonPressed event need UFunc
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Widget_Index;  // prop need in Menu Option
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) FText Button_Name;  // same as above
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) UButton *Button;  // Handle Pressed
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) UTextBlock *Button_Text_Block;  // Text in Button
+
+private:
+	void Button_Free_Memmory();  // Say Garbage Collector to destroy this object
 	void Toogle_DirectX() const;
 	void Set_Screen_Percentage() const;
 	void Set_Screen_Resolution() const;
-
-	UAMenu_Main_Setting_Button **Buttons_Settings_Array {};
-
-	void Update_State() const;
-	UFUNCTION(BlueprintCallable) void Set_Button_State(bool is_button_active);
-	UFUNCTION() void Button_Pressed();  // OnButtonPressed event
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) EOption_Type Option_Type;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Widget_Index;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) FText Button_Name;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) UButton *Button;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) UTextBlock *Button_Text;
-
+	void Update_State() const;  // Apply settings to game
 };
 //-----------------------------------------------------------------------------------------------------------
 
@@ -81,22 +78,11 @@ UCLASS(meta = (DisableNativeTick) ) class UAMenu_Main_Settings : public UUserWid
 public:
 	virtual void NativeConstruct();
 
-	void Init();
-	void Clear_Memmory();
-
-	void Button_Create_Default();
-
-	UAMenu_Main_Setting_Button *Button_Array[Menu_Main_Config::Button_Setting_Count] {};  // !!! Mem leak | Stored Max 5 Buttons || 5 Buttons is Max
-
 	UFUNCTION() void Handle_Spin_Box(float test);
 
-	UFUNCTION(BlueprintCallable) void Button_Array_Emplace(const int button_index, UWidget *button_widget);  // Add Widget to Array
-	UFUNCTION(BlueprintCallable) void Button_Active_Draw();  // Add Widget to Array
-	UFUNCTION(BlueprintCallable) void Button_Spin_Box_Update();  // Update Button marked with spinned box
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) bool Is_Spin_Box;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Buttons_Count;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) EOption_Type Button_Type;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) bool Is_Button_Spin_Box;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) int Buttons_Count;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) TSubclassOf<UUserWidget> Button_Class;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) FText Menu_Settings_Text;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (ExposeOnSpawn = "true") ) TArray<FText> Buttons_Name;
@@ -104,6 +90,16 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) UTextBlock *Menu_Settings_Name;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) UHorizontalBox *Horizontal_Box_List;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Init", meta = (BindWidget) ) USpinBox *Spin_Box_Root;
+
+private:
+	void Clear_Memmory();  // !!!
+	void Button_Create_Default();
+
+	void Button_Array_Emplace(const int button_index, UWidget* button_widget);  // Add Widget to Array
+	void Button_Active_Draw();  // Add Widget to Array
+	void Button_Spin_Box_Update();  // Update Button marked with spinned box
+
+	UAMenu_Main_Setting_Button *Button_Array[Menu_Main_Config::Button_Setting_Count] {};  // !!! Mem leak | Stored Max 5 Buttons || 5 Buttons is Max
 };
 //-----------------------------------------------------------------------------------------------------------
 
